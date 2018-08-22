@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Moq;
 using WebDataModel;
 using WebDataService.Controllers;
 using System.Web.Http.Results;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.OData;
 using System.Web.Http.Tracing;
 using System.Web.Http.Controllers;
+using JsonPatch;
 
 namespace WebService.Tests
 {
@@ -24,21 +20,6 @@ namespace WebService.Tests
        [SetUp]
         public void Setup()
         {
-            //_products = SetUpProducts();
-            //_tokens = SetUpTokens();
-            //_dbEntities = new Mock<WebApiDbEntities>().Object;
-            //_tokenRepository = SetUpTokenRepository();
-            //_productRepository = SetUpProductRepository();
-            //var unitOfWork = new Mock<IUnitOfWork>();
-            //unitOfWork.SetupGet(s => s.ProductRepository).Returns(_productRepository);
-            //unitOfWork.SetupGet(s => s.TokenRepository).Returns(_tokenRepository);
-            //_unitOfWork = unitOfWork.Object;
-            //_productService = new ProductServices(_unitOfWork);
-            //_tokenService = new TokenServices(_unitOfWork);
-            //_client = new HttpClient { BaseAddress = new Uri(ServiceBaseURL) };
-            //var tokenEntity = _tokenService.GenerateToken(1);
-            //_token = tokenEntity.AuthToken;
-            //_client.DefaultRequestHeaders.Add("Token", _token);
             nopvList = new List<NOPVData>
             {
                 new NOPVData
@@ -158,24 +139,24 @@ namespace WebService.Tests
         [Test]
         public void TestPatch()
         {
-            var delta = new Delta<NOPVData>(typeof(NOPVData));
+            var delta = new JsonPatchDocument<NOPVData>();
                         
             var mockService = new Mock<INopvDataRepository>();
-            //mockService.Setup(repo => repo.UpdateDetails(
-            //    It.IsAny<string>(), //Any value of BBL
-            //    It.IsAny<Delta<NOPVData>>()) //Any value of Delata object
-            //    ).Returns(nopvList.FirstOrDefault(d => d.BBL == "1005690029"));
+            mockService.Setup(repo => repo.UpdateDetails(
+                It.IsAny<string>(), //Any value of BBL
+                It.IsAny<JsonPatchDocument<NOPVData>>()) //Any value of Delata object
+                ).Returns(nopvList.FirstOrDefault(d => d.BBL == "1005690029"));
 
             var controller = new NopvDataController(mockService.Object);
             //Act
-            //IHttpActionResult actionResult = controller.Patch("1005690029", delta);
+            IHttpActionResult actionResult = controller.Patch("1005690029", delta);
             //// Assert
-            //Assert.IsInstanceOf(typeof(OkNegotiatedContentResult<NOPVData>), actionResult);
-            //var contentResult = actionResult as OkNegotiatedContentResult<NOPVData>;
-            //// Assert the result  
-            //Assert.IsNotNull(contentResult);
-            //Assert.IsNotNull(contentResult.Content);
-            //Assert.AreEqual(contentResult.Content.BBL, "1005690029");
+            Assert.IsInstanceOf(typeof(OkNegotiatedContentResult<NOPVData>), actionResult);
+            var contentResult = actionResult as OkNegotiatedContentResult<NOPVData>;
+            // Assert the result  
+            Assert.IsNotNull(contentResult);
+            Assert.IsNotNull(contentResult.Content);
+            Assert.AreEqual("1005690029", contentResult.Content.BBL);
         }
 
 
