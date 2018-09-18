@@ -19,6 +19,11 @@ namespace WebDataService.Providers
             context.Validated();
         }
 
+        //public override Task GrantClientCredentials(OAuthGrantClientCredentialsContext context)
+        //{
+        //    return base.GrantClientCredentials(context);
+        //}
+
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
 
